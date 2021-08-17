@@ -1,0 +1,25 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+cc_test(
+    name = "examples",
+    srcs = [
+        #"callback.cc",
+        #"closure.cc",
+        #"conditional.cc",
+        #"eventual.cc",
+        "libcurl.cc",
+        #"lock.cc",
+        #"repeat.cc",
+        #"static-thread-pool.cc",
+        #"stream.cc",
+        #"task.cc",
+        #"then.cc",
+    ],
+    linkstatic = True,
+    deps = [
+        "//:eventuals",
+        "//:libcurl",
+        "//:libuv",
+        "@gtest//:gtest_main",
+    ],
+)

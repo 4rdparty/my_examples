@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "(Windows) Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bazel-out/x64_windows-fastbuild/bin/test/examples.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+    ]
+}

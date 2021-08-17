@@ -1,0 +1,98 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+filegroup(
+    name = "all",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+
+#prepare LIBUV library
+#=============================================================
+cmake(
+    name = "libuv",
+    cache_entries = {
+        "CMAKE_BUILD_TYPE": "Release",
+        "LIBUV_BUILD_TESTS": "OFF",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_LIBS": "ON",
+        "LIBUV_BUILD_BENCH": "OFF",
+    },
+    lib_source = "@libuv//:all",
+    #here is simple comparison that the files in this path and their names are same
+    out_static_libs = select({
+        "@bazel_tools//src/conditions:windows": [
+            "Release/uv_a.lib",
+        ],
+        "//conditions:default": ["libuv_a.a"],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+#=============================================================
+cmake(
+    name = "libcurl",
+    cache_entries = {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_TESTING": "OFF",
+        "BUILD_SHARED_LIBS": "OFF",
+        "CURL_STATIC_CRT": "ON",
+    },
+    lib_source = "@libcurl//:all",
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": ["/DYNAMICBASE ws2_32.lib wldap32.lib advapi32.lib kernel32.lib comdlg32.lib crypt32.lib normaliz.lib"],  # Windows
+        "@bazel_tools//src/conditions:darwin": [],  # macOS
+        "//conditions:default": [],  # Linux
+    }),
+    #here is simple comparison that the files in this path and their names are same
+    out_static_libs = select({
+        "@bazel_tools//src/conditions:windows": [
+            "libcurl.lib",
+        ],
+        "//conditions:default": ["libuv_a.a"],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+#prepare EVENTUALS library
+#=============================================================
+cc_library(
+    name = "eventuals",
+    srcs = [
+        "stout/scheduler.cc",
+        "stout/static-thread-pool.cc",
+    ],
+    hdrs = [
+        "stout/callback.h",
+        "stout/closure.h",
+        "stout/compose.h",
+        "stout/conditional.h",
+        "stout/context.h",
+        "stout/eventual.h",
+        "stout/interrupt.h",
+        "stout/just.h",
+        "stout/lambda.h",
+        "stout/lock.h",
+        "stout/loop.h",
+        "stout/map.h",
+        "stout/raise.h",
+        "stout/reduce.h",
+        "stout/repeat.h",
+        "stout/scheduler.h",
+        "stout/semaphore.h",
+        "stout/sequence.h",
+        "stout/static-thread-pool.h",
+        "stout/stream.h",
+        "stout/task.h",
+        "stout/terminal.h",
+        "stout/then.h",
+        "stout/transform.h",
+        "stout/type-traits.h",
+        "stout/undefined.h",
+        "stout/until.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_google_glog//:glog",
+    ],
+)
